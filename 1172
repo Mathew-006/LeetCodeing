@@ -1,0 +1,61 @@
+class DinnerPlates {
+
+List<Stack<Integer>> stacks; // ArrayList of stacks of plates
+int capacity;
+TreeSet<Integer> availableStack; // Track of the ordered indices of stacks with available space to push new elements
+
+public DinnerPlates(int capacity) {
+    this.stacks = new ArrayList<Stack<Integer>>();
+    this.capacity = capacity;
+    this.availableStack = new TreeSet<Integer>();
+}
+
+public void push(int val) {
+    if (availableStack.isEmpty()) { // No stack with space is available
+        stacks.add(new Stack<Integer>()); // Add a new empty stack
+        availableStack.add(stacks.size() - 1); // Add the index of the newly added stack
+    }
+
+    Stack<Integer> firstStackWithSpace = stacks.get(availableStack.first());
+    firstStackWithSpace.push(val);
+
+    if (firstStackWithSpace.size() == capacity) {
+        availableStack.pollFirst(); // Remove the smallest value (index of stack)
+    }
+}
+
+public int pop() {
+    if (stacks.isEmpty()) { // No stack is present
+        return -1; // Return -1
+    }
+    int val = stacks.get(stacks.size() - 1).pop(); // Pop from the last stack in the list of stacks
+
+    
+    availableStack.add(stacks.size() - 1);
+
+    
+    while (!stacks.isEmpty() && stacks.get(stacks.size() - 1).isEmpty()) {
+        stacks.remove(stacks.size() - 1); // Remove the stack from the list of stacks
+
+    
+        availableStack.pollLast();
+    }
+
+    return val;
+}
+
+public int popAtStack(int index) {
+    if (index >= stacks.size()) {
+        return -1; // Invalid stack index
+    }
+    if (index == stacks.size() - 1) { // Basically the last stack
+        return pop();
+    }
+
+    Stack<Integer> requiredStack = stacks.get(index);
+    int val = requiredStack.isEmpty() ? -1 : requiredStack.pop();
+    availableStack.add(index); // Since we removed an element, it frees up a space in that stack
+
+    return val;
+}
+}
