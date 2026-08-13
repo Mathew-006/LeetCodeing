@@ -1,0 +1,47 @@
+Intuition
+
+The problem requires us to find the smallest missing integer that is greater than or equal to the sum of the longest sequential prefix. A sequential prefix strictly means each element is exactly 1 greater than its predecessor. Once this sequential sequence breaks, the rest of the array doesn't matter for the initial sum. After calculating this sum, we just need a fast way to check if the current sum (or its increments) exists anywhere else in the entire array.
+Approach
+
+    Calculate the Prefix Sum: We start with sum = nums[0]. We iterate through the array starting from index 1. As long as nums[i] == nums[i - 1] + 1, we add nums[i] to our sum. The moment this condition fails, we break out of the loop.
+    Use a HashSet for Fast Lookups: We insert all elements of nums into a HashSet. This allows us to check if an element exists in O(1) average time.
+    Find the Smallest Missing Integer: We run a while loop checking if sum is present in our HashSet. If it is, we increment sum by 1 and check again. The loop terminates the moment we hit a value that is missing from the set.
+
+Complexity
+
+    Time complexity: O(N)
+    Finding the prefix sum takes at most O(N) steps. Building the HashSet takes O(N) time. The final refinement loop runs at most O(N) times because there are at most N unique elements in the set that could conflict with our target.
+    Space complexity: O(N)
+    We utilize a HashSet to store the unique values of the array to achieve O(1) lookup times.
+
+Code
+
+import java.util.HashSet;
+
+class Solution {
+    public int missingInteger(int[] nums) {
+        // Step 1: Find the sum of the longest sequential prefix
+        int sum = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] == nums[i - 1] + 1) {
+                sum += nums[i];
+            } else {
+                break;
+            }
+        }
+        
+        // Step 2: Store all array elements in a set for O(1) lookups
+        HashSet<Integer> numSet = new HashSet<>();
+        for (int num : nums) {
+            numSet.add(num);
+        }
+        
+        // Step 3: Increment sum until we find an integer missing from the set
+        while (numSet.contains(sum)) {
+            sum++;
+        }
+        
+        // Return the final smallest missing integer
+        return sum;
+    }
+}
