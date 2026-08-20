@@ -1,0 +1,42 @@
+class Solution {
+    public int countBinaryPalindromes(long n) {
+        if (n == 0) {
+            return 1;
+        }
+
+        int count = 1;
+        int m = 64 - Long.numberOfLeadingZeros(n);
+
+        for (int i = 1; i < m; i++) {
+            count += 1 << ((i - 1) / 2);
+        }
+
+        int mid = m / 2;
+        for (int i = m - 2; i >= mid; i--) {
+            if ((n & (1L << i)) != 0) {
+                count += 1 << (i - mid);
+            }
+        }
+
+        long leftHalf = n >>> mid;
+        long pal = leftHalf;
+        for (int i = (m % 2 == 0 ? 0 : 1); i < leftHalf; i++) {
+        }
+        
+        pal = leftHalf;
+        long temp = leftHalf;
+        if (m % 2 != 0) {
+            temp >>>= 1;
+        }
+        while (temp > 0) {
+            pal = (pal << 1) | (temp & 1);
+            temp >>>= 1;
+        }
+
+        if (pal <= n) {
+            count++;
+        }
+
+        return count;
+    }
+}
