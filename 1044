@@ -1,0 +1,42 @@
+import java.util.HashSet;
+
+class Solution {
+    private long M1 = 1_000_000_007, M2 = 1_000_000_009, B = 31;
+
+    public String longestDupSubstring(String s) {
+        int n = s.length(), left = 1, right = n - 1, startIdx = -1;
+        long[] p1 = new long[n], p2 = new long[n];
+        p1[0] = p2[0] = 1;
+        for (int i = 1; i < n; i++) {
+            p1[i] = (p1[i - 1] * B) % M1;
+            p2[i] = (p2[i - 1] * B) % M2;
+        }
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            int idx = check(s, mid, p1, p2);
+            if (idx != -1) { startIdx = idx; left = mid + 1; }
+            else right = mid - 1;
+        }
+        return startIdx == -1 ? "" : s.substring(startIdx, startIdx + left - 1);
+    }
+
+    private int check(String s, int len, long[] p1, long[] p2) {
+        HashSet<Long> seen = new HashSet<>();
+        long h1 = 0, h2 = 0;
+        for (int i = 0; i < len; i++) {
+            h1 = (h1 * B + (s.charAt(i) - 'a')) % M1;
+            h2 = (h2 * B + (s.charAt(i) - 'a')) % M2;
+        }
+        seen.add((h1 << 32) | h2);
+        for (int i = len; i < s.length(); i++) {
+            h1 = (h1 - (s.charAt(i - len) - 'a') * p1[len - 1]) % M1;
+            h1 = (h1 * B + (s.charAt(i) - 'a')) % M1;
+            if (h1 < 0) h1 += M1;
+            h2 = (h2 - (s.charAt(i - len) - 'a') * p2[len - 1]) % M2;
+            h2 = (h2 * B + (s.charAt(i) - 'a')) % M2;
+            if (h2 < 0) h2 += M2;
+            if (!seen.add((h1 << 32) | h2)) return i - len + 1;
+        }
+        return -1;
+    }
+}
